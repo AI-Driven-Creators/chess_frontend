@@ -9,8 +9,14 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            font-family: Arial, sans-serif;
+            font-family: 'Noto Sans TC', sans-serif;
             background-color: #1a1a1a;
+        }
+        @font-face {
+            font-family: 'Noto Sans TC';
+            src: url('NotoSansTC-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
         }
         #application-canvas {
             width: 100%;
@@ -130,10 +136,14 @@
                 pivot: new pc.Vec2(0.5, 0.5),
                 width: 200,
                 height: 50,
-                fontAsset: fontAsset,
                 fontSize: 24,
                 color: new pc.Color(1, 1, 1),
-                text: '商店 (Shop)'
+                text: '商店 (Shop)',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             shopContainer.addChild(shopLabel);
             uiRoot.addChild(shopContainer);
@@ -157,10 +167,14 @@
                 pivot: new pc.Vec2(0.5, 0.5),
                 width: 200,
                 height: 50,
-                fontAsset: fontAsset,
                 fontSize: 24,
                 color: new pc.Color(1, 1, 1),
-                text: '棋盤 (Board)'
+                text: '棋盤 (Board)',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             boardContainer.addChild(boardLabel);
             uiRoot.addChild(boardContainer);
@@ -185,10 +199,14 @@
                 pivot: new pc.Vec2(0.5, 0.5),
                 width: 200,
                 height: 50,
-                fontAsset: fontAsset,
                 fontSize: 24,
                 color: new pc.Color(1, 1, 1),
-                text: '板凳 (Bench)'
+                text: '板凳 (Bench)',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             benchContainer.addChild(benchLabel);
             uiRoot.addChild(benchContainer);
@@ -213,10 +231,14 @@
                 pivot: new pc.Vec2(0.5, 0.5),
                 width: 200,
                 height: 50,
-                fontAsset: fontAsset,
                 fontSize: 20,
                 color: new pc.Color(1, 1, 1),
-                text: '資訊面板 (Info Panel)'
+                text: '資訊面板 (Info Panel)',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             infoPanelContainer.addChild(infoPanelLabel);
             uiRoot.addChild(infoPanelContainer);
@@ -241,10 +263,14 @@
                 pivot: new pc.Vec2(0.5, 0.5),
                 width: 200,
                 height: 50,
-                fontAsset: fontAsset,
                 fontSize: 20,
                 color: new pc.Color(1, 1, 1),
-                text: '動作按鈕 (Action Buttons)'
+                text: '動作按鈕 (Action Buttons)',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             actionButtonContainer.addChild(actionButtonLabel);
             uiRoot.addChild(actionButtonContainer);
@@ -288,10 +314,14 @@
                     height: 30,
                     anchor: new pc.Vec4(0.5, 0, 0.5, 0),
                     pivot: new pc.Vec2(0.5, 0),
-                    fontAsset: fontAsset,
                     fontSize: 16,
                     color: new pc.Color(1, 1, 1),
-                    text: 'Chess Name'
+                    text: 'Chess Name',
+                    fontFamily: 'Noto Sans TC',
+                    textAlign: 'center',
+                    autoWidth: false,
+                    autoHeight: false,
+                    enabled: true
                 });
                 template.addChild(nameText);
                 
@@ -302,10 +332,14 @@
                     height: 20,
                     anchor: new pc.Vec4(1, 0, 1, 0),
                     pivot: new pc.Vec2(1, 0),
-                    fontAsset: fontAsset,
                     fontSize: 14,
                     color: new pc.Color(1, 1, 0),
-                    text: '★1'
+                    text: '★1',
+                    fontFamily: 'Noto Sans TC',
+                    textAlign: 'right',
+                    autoWidth: false,
+                    autoHeight: false,
+                    enabled: true
                 });
                 template.addChild(levelText);
                 
@@ -346,10 +380,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 12,
                 color: new pc.Color(1, 1, 1, 0.7),
-                text: 'X,Y'
+                text: 'X,Y',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             boardCellTemplate.addChild(cellCoordinates);
             
@@ -378,10 +416,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 16,
                 color: new pc.Color(1, 1, 1),
-                text: '刷新 (2G)'
+                text: '刷新 (2G)',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             refreshButton.addChild(refreshText);
             shopContainer.addChild(refreshButton);
@@ -401,10 +443,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 16,
                 color: new pc.Color(1, 1, 1),
-                text: '鎖定'
+                text: '鎖定',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             lockButton.addChild(lockText);
             shopContainer.addChild(lockButton);
@@ -414,10 +460,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.5, 0.2, 0.5, 0.2),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 20,
                 color: new pc.Color(1, 0.8, 0.2),
-                text: '10G'
+                text: '10G',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             shopContainer.addChild(moneyText);
             
@@ -437,10 +487,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 16,
                 color: new pc.Color(1, 1, 1),
-                text: '售出區域'
+                text: '售出區域',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             sellZone.addChild(sellZoneText);
             benchContainer.addChild(sellZone);
@@ -461,10 +515,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 18,
                 color: new pc.Color(1, 1, 1),
-                text: '購買 XP (4G)'
+                text: '購買 XP (4G)',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             buyXPButton.addChild(buyXPText);
             actionButtonContainer.addChild(buyXPButton);
@@ -497,10 +555,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.5, 0.65, 0.5, 0.65),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 16,
                 color: new pc.Color(1, 1, 1),
-                text: 'XP: 2/6'
+                text: 'XP: 2/6',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             actionButtonContainer.addChild(xpText);
             
@@ -509,10 +571,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.5, 0.6, 0.5, 0.6),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 20,
                 color: new pc.Color(1, 0.8, 0.2),
-                text: 'Level 3'
+                text: 'Level 3',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             actionButtonContainer.addChild(levelText);
             
@@ -564,10 +630,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0, 0, 0.7, 1),
                 pivot: new pc.Vec2(0, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 14,
                 color: new pc.Color(1, 1, 1),
-                text: '羈絆名稱'
+                text: '羈絆名稱',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'left',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             synergyTemplate.addChild(synergyNameText);
             
@@ -576,10 +646,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.7, 0, 0.85, 1),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 14,
                 color: new pc.Color(1, 1, 0),
-                text: '0'
+                text: '0',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             synergyTemplate.addChild(synergyCountText);
             
@@ -588,10 +662,14 @@
                 type: 'text',
                 anchor: new pc.Vec4(0.85, 0, 1, 1),
                 pivot: new pc.Vec2(0.5, 0.5),
-                fontAsset: fontAsset,
                 fontSize: 14,
                 color: new pc.Color(0, 1, 0),
-                text: 'Lv0'
+                text: 'Lv0',
+                fontFamily: 'Noto Sans TC',
+                textAlign: 'center',
+                autoWidth: false,
+                autoHeight: false,
+                enabled: true
             });
             synergyTemplate.addChild(synergyBonusText);
             
@@ -624,8 +702,8 @@
             // Start the application
             app.start();
             
-            // Make app globally accessible for debugging
-            window.app = app;
+            // Hide loading screen
+            document.getElementById('loading-screen').style.display = 'none';
         });
     </script>
 </body>
