@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自走棋模擬器 - Auto Chess Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+        }
+        #application-canvas {
+            width: 100%;
+            height: 100vh;
+        }
+        #loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 100;
+        }
+        #loading-bar {
+            width: 300px;
+            height: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        #loading-bar-progress {
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <h1>自走棋模擬器</h1>
+        <p>Loading...</p>
+        <div id="loading-bar">
+            <div id="loading-bar-progress"></div>
+        </div>
+    </div>
+    <canvas id="application-canvas"></canvas>
+
+    <!-- PlayCanvas Engine -->
+    <script src="https://code.playcanvas.com/playcanvas-stable.min.js"></script>
+    
+    <!-- Main App Script - This is the only script we need to include directly -->
+    <script type="module" src="dist/app.js"></script>
+
+    <script type="module">
+        // Initialize PlayCanvas application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create the application
+            const canvas = document.getElementById('application-canvas');
+            const app = new pc.Application(canvas);
+            
+            // Set canvas to fill window
+            app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
+            app.setCanvasResolution(pc.RESOLUTION_AUTO);
+            
+            // Ensure canvas is resized when window changes size
+            window.addEventListener('resize', function() {
+                app.resizeCanvas();
+            });
+            
+            // Create camera entity
+            const camera = new pc.Entity('Camera');
+            camera.addComponent('camera', {
+                clearColor: new pc.Color(0.1, 0.1, 0.1)
+            });
+            camera.setPosition(0, 0, 10);
+            app.root.addChild(camera);
+            
+            // Create light entity
+            const light = new pc.Entity('Light');
+            light.addComponent('light', {
+                type: 'directional',
+                color: new pc.Color(1, 1, 1),
+                castShadows: true,
+                intensity: 1.5
+            });
+            light.setEulerAngles(45, 0, 0);
+            app.root.addChild(light);
+            
+            // Create UI root entity
+            const uiRoot = new pc.Entity('UI Root');
+            uiRoot.addComponent('screen', {
+                referenceResolution: new pc.Vec2(1920, 1080),
+                screenSpace: true
+            });
+            app.root.addChild(uiRoot);
+            
+            // Create UI containers
+            const shopContainer = new pc.Entity('Shop Container');
+            shopContainer.addComponent('element', {
+                type: 'group',
+                anchor: new pc.Vec4(0.5, 0, 0.5, 0),
+                pivot: new pc.Vec2(0.5, 0),
+                width: 800,
+                height: 150,
+                margin: new pc.Vec4(0, 10, 0, 10)
+            });
+            uiRoot.addChild(shopContainer);
+            
+            const boardContainer = new pc.Entity('Board Container');
+            boardContainer.addComponent('element', {
+                type: 'group',
+                anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
+                pivot: new pc.Vec2(0.5, 0.5),
+                width: 800,
+                height: 400
+            });
+            uiRoot.addChild(boardContainer);
+            
+            const benchContainer = new pc.Entity('Bench Container');
+            benchContainer.addComponent('element', {
+                type: 'group',
+                anchor: new pc.Vec4(0.5, 1, 0.5, 1),
+                pivot: new pc.Vec2(0.5, 1),
+                width: 800,
+                height: 150,
+                margin: new pc.Vec4(0, 10, 0, 10)
+            });
+            uiRoot.addChild(benchContainer);
+            
+            const infoPanelContainer = new pc.Entity('Info Panel Container');
+            infoPanelContainer.addComponent('element', {
+                type: 'group',
+                anchor: new pc.Vec4(0, 0, 0, 1),
+                pivot: new pc.Vec2(0, 0.5),
+                width: 250,
+                height: 600,
+                margin: new pc.Vec4(10, 0, 0, 0)
+            });
+            uiRoot.addChild(infoPanelContainer);
+            
+            const actionButtonContainer = new pc.Entity('Action Button Container');
+            actionButtonContainer.addComponent('element', {
+                type: 'group',
+                anchor: new pc.Vec4(1, 0, 1, 1),
+                pivot: new pc.Vec2(1, 0.5),
+                width: 250,
+                height: 600,
+                margin: new pc.Vec4(0, 0, 10, 0)
+            });
+            uiRoot.addChild(actionButtonContainer);
+            
+            // Function to create templates
+            function createCardTemplate(name, width, height, color) {
+                const template = new pc.Entity(name);
+                template.addComponent('element', {
+                    type: 'image',
+                    width: width,
+                    height: height,
+                    color: color
+                });
+                
+                const nameText = new pc.Entity('NameText');
+                nameText.addComponent('element', {
+                    type: 'text',
+                    width: width,
+                    height: 30,
+                    anchor: new pc.Vec4(0.5, 0, 0.5, 0),
+                    pivot: new pc.Vec2(0.5, 0),
+                    fontAsset: null, // Will need to load font asset
+                    fontSize: 16,
+                    color: new pc.Color(1, 1, 1),
+                    text: 'Chess Name'
+                });
+                template.addChild(nameText);
+                
+                const levelText = new pc.Entity('LevelText');
+                levelText.addComponent('element', {
+                    type: 'text',
+                    width: width,
+                    height: 20,
+                    anchor: new pc.Vec4(1, 0, 1, 0),
+                    pivot: new pc.Vec2(1, 0),
+                    fontAsset: null, // Will need to load font asset
+                    fontSize: 14,
+                    color: new pc.Color(1, 1, 0),
+                    text: '★1'
+                });
+                template.addChild(levelText);
+                
+                return template;
+            }
+            
+            // Create templates
+            const shopCardTemplate = createCardTemplate('ShopCardTemplate', 120, 160, new pc.Color(0.3, 0.3, 0.3));
+            shopCardTemplate.enabled = false;
+            shopContainer.addChild(shopCardTemplate);
+            
+            const benchCardTemplate = createCardTemplate('BenchCardTemplate', 80, 120, new pc.Color(0.3, 0.3, 0.3));
+            benchCardTemplate.enabled = false;
+            benchContainer.addChild(benchCardTemplate);
+            
+            const boardCellTemplate = new pc.Entity('BoardCellTemplate');
+            boardCellTemplate.addComponent('element', {
+                type: 'image',
+                width: 80,
+                height: 80,
+                color: new pc.Color(0.5, 0.5, 0.5)
+            });
+            boardCellTemplate.enabled = false;
+            boardContainer.addChild(boardCellTemplate);
+            
+            const boardPieceTemplate = createCardTemplate('BoardPieceTemplate', 70, 70, new pc.Color(0.3, 0.6, 0.3));
+            boardPieceTemplate.enabled = false;
+            boardContainer.addChild(boardPieceTemplate);
+            
+            // Create UI components
+            const shopUI = new pc.Entity('ShopUI');
+            shopUI.addComponent('script');
+            shopUI.script.create('shopUI', {
+                cardTemplate: shopCardTemplate,
+                refreshButton: null, // Will need to create
+                lockButton: null, // Will need to create
+                cardContainer: shopContainer,
+                moneyText: null // Will need to create
+            });
+            shopContainer.addChild(shopUI);
+            
+            const benchUI = new pc.Entity('BenchUI');
+            benchUI.addComponent('script');
+            benchUI.script.create('benchUI', {
+                cardTemplate: benchCardTemplate,
+                cardContainer: benchContainer,
+                sellZone: null, // Will need to create
+                benchSize: 9
+            });
+            benchContainer.addChild(benchUI);
+            
+            const boardUI = new pc.Entity('BoardUI');
+            boardUI.addComponent('script');
+            boardUI.script.create('boardUI', {
+                cellTemplate: boardCellTemplate,
+                pieceTemplate: boardPieceTemplate,
+                boardContainer: boardContainer,
+                boardWidth: 8,
+                boardHeight: 3,
+                cellSize: 80
+            });
+            boardContainer.addChild(boardUI);
+            
+            // Start the application
+            app.start();
+            
+            // Make app globally accessible for debugging
+            window.app = app;
+        });
+    </script>
+</body>
+</html>

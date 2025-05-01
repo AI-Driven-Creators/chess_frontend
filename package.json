@@ -1,0 +1,25 @@
+{
+  "name": "chess-frontend",
+  "version": "1.0.0",
+  "description": "自走棋模擬器前端框架 - Auto Chess Simulator Frontend",
+  "main": "index.html",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "http-server -c-1 -p 8080",
+    "dev": "concurrently \"npm run watch\" \"npm run start\""
+  },
+  "keywords": [
+    "auto-chess",
+    "playcanvas",
+    "typescript",
+    "game"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "http-server": "^14.1.1",
+    "typescript": "^5.1.6"
+  }
+}
