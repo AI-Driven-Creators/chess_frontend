@@ -1,0 +1,133 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 專案規則
+
+## 專案概述
+這是一個使用 PlayCanvas WebGL 遊戲引擎但不使用 PlayCanvas Editor 的專案。所有 UI 和遊戲邏輯都是通過代碼直接實現的。本專案是一個聯盟戰棋遊戲的前端實現，使用 TypeScript 開發。
+
+## 專案結構
+- `src/` - 源代碼目錄
+  - `app.ts` - 主應用入口，負責初始化 PlayCanvas 應用和遊戲場景
+  - `gameState.ts` - 遊戲狀態管理，處理遊戲邏輯和狀態轉換
+  - `websocket.ts` - WebSocket 連接管理，處理與後端的實時通信
+  - `components/` - UI 組件目錄
+# 專案規則
+
+## 專案概述
+這是一個使用 PlayCanvas WebGL 遊戲引擎但不使用 PlayCanvas Editor 的專案。所有 UI 和遊戲邏輯都是通過代碼直接實現的。本專案是一個象棋遊戲的前端實現，使用 TypeScript 開發。
+
+## 專案結構
+- `src/` - 源代碼目錄
+  - `app.ts` - 主應用入口，負責初始化 PlayCanvas 應用和遊戲場景
+  - `gameState.ts` - 遊戲狀態管理，處理遊戲邏輯和狀態轉換
+  - `websocket.ts` - WebSocket 連接管理，處理與後端的實時通信
+  - `components/` - UI 組件目錄
+    - `BoardUI.ts` - 棋盤 UI 組件
+    - `BenchUI.ts` - 板凳區 UI 組件
+    - `ShopUI.ts` - 商店 UI 組件
+    - `ActionButtonPanel.ts` - 操作按鈕面板
+    - `InfoPanel.ts` - 信息面板
+  - `types/` - TypeScript 類型定義
+    - `playcanvas.d.ts` - PlayCanvas 引擎類型定義
+  - `utils/` - 工具函數
+    - `dragDrop.ts` - 拖拽相關功能
+    - `apiHelpers.ts` - API 輔助函數
+
+## PlayCanvas 開發規範
+1. 不使用 PlayCanvas Editor，所有場景和實體都通過代碼創建
+2. UI 組件開發規範：
+   - 使用 `pc.Entity` 作為基礎組件容器
+   - UI 元素應該繼承自 `pc.Entity`
+   - 使用 `pc.ElementComponent` 進行 UI 元素渲染
+   - 組件命名規範：
+     - 類名使用 PascalCase
+     - 文件名與類名保持一致
+     - 組件文件放在對應的目錄下
+3. 場景管理：
+   - 使用 `pc.Application` 管理主場景
+   - 場景切換通過代碼實現
+   - 資源加載使用 `pc.AssetRegistry`
+   - 場景初始化流程：
+     1. 創建應用實例
+     2. 加載必要資源
+     3. 初始化場景
+     4. 設置事件監聽
+4. 性能優化：
+   - 合理使用 `pc.Entity.destroy()`
+   - 注意內存管理，及時釋放不需要的資源
+   - 使用 `pc.Entity.enabled` 控制組件可見性
+   - 避免頻繁創建和銷毀實體
+   - 使用對象池管理可重用的實體
+
+## 代碼規範
+1. TypeScript 規範：
+   - 使用 TypeScript 4.x 或更高版本
+   - 嚴格模式：`"strict": true`
+   - 使用 ES6+ 特性
+   - 使用 async/await 處理異步操作
+2. 命名規範：
+   - 變量：camelCase
+   - 常量：UPPER_SNAKE_CASE
+   - 類：PascalCase
+   - 接口：I 前綴 + PascalCase
+   - 枚舉：PascalCase
+3. 文件組織：
+   - 每個文件只包含一個主要類或功能
+   - 相關功能放在同一目錄下
+4. 註釋規範：
+   - 使用 JSDoc 格式
+   - 為公共 API 添加完整文檔
+   - 複雜邏輯添加說明註釋
+
+## 遊戲邏輯規範
+1. 棋盤表示：
+   - 使用二維數組表示棋盤狀態
+   - 坐標系統使用六角棋盤坐標
+2. 移動規則：
+   - 實現所有棋子的移動
+   - 移動邏輯由後端處理，前端只負責顯示
+3. 遊戲狀態：
+   - 維護當前玩家狀態
+   - 顯示後端要顯示的狀態
+
+## 網絡通信規範
+1. WebSocket 通信：
+   - 使用 JSON 格式傳輸數據
+   - 實現心跳機制
+   - 處理斷線重連
+2. 消息格式：
+   - 照 [GAME_API.md](mdc:GAME_API.md) 文件來定義
+
+## 重要文件
+- [README.md](mdc:README.md) - 上手文檔
+- [GAME_API.md](mdc:GAME_API.md) - 遊戲 API 文檔，包含所有 API 接口說明
+- [GameRule.txt](mdc:GameRule.txt) - 遊戲規則文檔，詳細說明遊戲規則
+- [chess_52.json](mdc:chess_52.json) - 所有角色數據
+
+## 構建和運行
+1. 開發環境：
+   - Node.js 16.x 或更高版本
+   - npm 8.x 或更高版本
+2. 構建命令：
+   - 開發環境：`npm run dev`
+   - 生產環境：`npm run build`
+3. 運行環境：
+   - 現代瀏覽器（Chrome、Firefox、Safari、Edge）
+   - 支持 WebGL 2.0
+
+## 注意事項
+1. 確保所有新添加的依賴都更新到 `package.json`
+2. 提交代碼前運行構建腳本確保沒有錯誤
+3. 遵循現有的代碼風格和專案結構
+4. 遵循 PlayCanvas 的最佳實踐和性能優化指南
+5. 注意 WebGL 資源的加載和釋放
+6. 確保 UI 組件在不同屏幕尺寸下的適配性
+7. 定期進行代碼審查
+8. 保持文檔更新
+9. 錯誤處理：
+    - 實現全局錯誤處理
+    - 提供友好的錯誤提示
+    - 記錄錯誤日誌
