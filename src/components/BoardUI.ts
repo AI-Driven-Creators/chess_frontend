@@ -7,6 +7,7 @@
 
 import { state, ChessPiece } from '../gameState.js';
 import { dragDropManager, BoardPosition } from '../utils/dragDrop.js';
+import * as pc from 'playcanvas';
 
 // Define the component attributes
 interface BoardUIAttributes {
@@ -16,6 +17,11 @@ interface BoardUIAttributes {
     boardWidth: number;
     boardHeight: number;
     cellSize: number;
+}
+
+// Add type definitions for UI elements
+interface UIElement extends pc.Entity {
+    element: pc.ElementComponent;
 }
 
 /**
@@ -106,7 +112,7 @@ export class BoardUI extends pc.ScriptType {
                 );
 
                 // Set up cell properties
-                const cellBg = cell.findByName('CellBackground');
+                const cellBg = cell.findByName('CellBackground') as pc.Entity;
                 if (cellBg && cellBg.element) {
                     // Alternate cell colors for a checkerboard pattern
                     const isEven = (x + y) % 2 === 0;
@@ -202,18 +208,18 @@ export class BoardUI extends pc.ScriptType {
      */
     private updatePieceEntity(pieceEntity: pc.Entity, chessPiece: ChessPiece): void {
         // Update piece content
-        const nameText = pieceEntity.findByName('NameText');
+        const nameText = pieceEntity.findByName('NameText') as UIElement;
         if (nameText && nameText.element) {
             nameText.element.text = chessPiece.chess;
         }
 
-        const levelText = pieceEntity.findByName('LevelText');
+        const levelText = pieceEntity.findByName('LevelText') as UIElement;
         if (levelText && levelText.element) {
             levelText.element.text = `★${chessPiece.level}`;
         }
 
         // Update piece background based on level
-        const pieceBg = pieceEntity.findByName('PieceBackground');
+        const pieceBg = pieceEntity.findByName('PieceBackground') as UIElement;
         if (pieceBg && pieceBg.element) {
             // Set background color based on level
             const colors = [
@@ -226,7 +232,7 @@ export class BoardUI extends pc.ScriptType {
         }
 
         // Update piece image
-        const pieceImage = pieceEntity.findByName('ChessImage');
+        const pieceImage = pieceEntity.findByName('ChessImage') as UIElement;
         if (pieceImage && pieceImage.element) {
             // Set the image based on the chess name
             // This is a placeholder, you would load actual textures
@@ -235,7 +241,7 @@ export class BoardUI extends pc.ScriptType {
 
         // Update health bar if available
         if (chessPiece.hp !== undefined && chessPiece.maxHp !== undefined) {
-            const healthBar = pieceEntity.findByName('HealthBar');
+            const healthBar = pieceEntity.findByName('HealthBar') as UIElement;
             if (healthBar && healthBar.element) {
                 const healthPercent = chessPiece.hp / chessPiece.maxHp;
                 healthBar.element.width = 70 * healthPercent; // Assuming the full width is 70
@@ -275,7 +281,9 @@ export class BoardUI extends pc.ScriptType {
      */
     private setupDragDrop(): void {
         // Listen for mouse move events on the document
-        this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
+        if (this.app.mouse) {
+            this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
+        }
     }
 
     /**
@@ -381,7 +389,7 @@ export class BoardUI extends pc.ScriptType {
 
         // Highlight the new cell
         this.highlightedCell = cell;
-        const cellBg = cell.findByName('CellBackground');
+        const cellBg = cell.findByName('CellBackground') as UIElement;
         if (cellBg && cellBg.element) {
             // Store the original color
             if (!cellBg.tags.has('original-color')) {
@@ -402,7 +410,7 @@ export class BoardUI extends pc.ScriptType {
             return;
         }
 
-        const cellBg = this.highlightedCell.findByName('CellBackground');
+        const cellBg = this.highlightedCell.findByName('CellBackground') as UIElement;
         if (cellBg && cellBg.element) {
             // Restore the original color
             const originalColorTag = cellBg.tags.list().find(tag => tag.startsWith('original-color:'));

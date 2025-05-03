@@ -1,6 +1,6 @@
 # 自走棋模擬器前端框架 (Auto Chess Simulator Frontend)
 
-使用 TypeScript 與 PlayCanvas 開發的多人 Web 自走棋模擬器前端框架。本專案專為連接 WebSocket API、顯示商店/棋盤/板凳狀態、處理拖曳與玩家互動而設計，並方便前端 UI 成員協作開發。
+使用 TypeScript 與 PlayCanvas 2.7 開發的多人 Web 自走棋模擬器前端框架。本專案專為連接 WebSocket API、顯示商店/棋盤/板凳狀態、處理拖曳與玩家互動而設計，並方便前端 UI 成員協作開發。
 
 ## 專案概述
 
@@ -13,6 +13,33 @@
 5. 使用 PlayCanvas 標準元件化方式進行組織
 6. 提供 `WebSocketManager` 類別處理事件註冊與傳送
 7. 提供 `gameState.ts` 用來集中管理整體狀態與同步更新
+
+## 開發環境設置
+
+### 必要條件
+- Node.js (建議使用 LTS 版本)
+- npm 或 yarn
+
+### 安裝依賴
+```bash
+npm install
+```
+
+### 開發伺服器
+```bash
+npm run dev
+```
+
+### 建置專案
+```bash
+npx vite
+```
+
+### 測試建置結果
+使用 `build.bat` 腳本可以快速測試建置結果：
+```bash
+build.bat
+```
 
 ## 專案結構
 

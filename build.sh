@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "=== 自走棋模擬器前端框架構建腳本 ==="
-echo ""
+echo
 
 echo "1. 檢查 Node.js 安裝..."
 if ! command -v node &> /dev/null; then
@@ -19,7 +19,7 @@ fi
 echo "[成功] 依賴安裝完成"
 
 echo "3. 編譯 TypeScript 檔案..."
-npm run build
+npx vite
 if [ $? -ne 0 ]; then
     echo "[錯誤] TypeScript 編譯失敗"
     exit 1
@@ -29,5 +29,5 @@ echo "[成功] TypeScript 編譯完成"
 echo "4. 啟動開發伺服器..."
 echo "[提示] 按 Ctrl+C 可停止伺服器"
 echo "[提示] 伺服器啟動後，請訪問 http://localhost:8080"
-echo ""
-npm run start
+echo
+npm run dev

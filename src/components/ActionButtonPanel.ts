@@ -7,6 +7,7 @@
 
 import { state } from '../gameState.js';
 import { sendBuyXP } from '../utils/apiHelpers.js';
+import * as pc from 'playcanvas';
 
 // Define the component attributes
 interface ActionButtonPanelAttributes {
@@ -14,6 +15,11 @@ interface ActionButtonPanelAttributes {
     xpProgressBar: pc.Entity;
     xpText: pc.Entity;
     levelText: pc.Entity;
+}
+
+// Add type definitions for UI elements
+interface UIElement extends pc.Entity {
+    element: pc.ElementComponent;
 }
 
 /**
@@ -109,7 +115,7 @@ export class ActionButtonPanel extends pc.ScriptType {
             const canAfford = state.money >= xpCost;
             
             // Visual feedback for affordability
-            const buttonBg = this.buyXPButton.findByName('ButtonBackground');
+            const buttonBg = this.buyXPButton.findByName('ButtonBackground') as UIElement;
             if (buttonBg && buttonBg.element) {
                 buttonBg.element.opacity = canAfford ? 1.0 : 0.5;
             }

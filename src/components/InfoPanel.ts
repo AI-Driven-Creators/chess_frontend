@@ -6,6 +6,7 @@
  */
 
 import { state, Synergy } from '../gameState.js';
+import * as pc from 'playcanvas';
 
 // Define the component attributes
 interface InfoPanelAttributes {
@@ -14,6 +15,11 @@ interface InfoPanelAttributes {
     xpText: pc.Entity;
     synergiesContainer: pc.Entity;
     synergyTemplate: pc.Entity;
+}
+
+// Add type definitions for UI elements
+interface UIElement extends pc.Entity {
+    element: pc.ElementComponent;
 }
 
 /**
@@ -116,23 +122,23 @@ export class InfoPanel extends pc.ScriptType {
             synergy.setLocalPosition(0, -index * (synergyHeight + spacing), 0);
 
             // Update synergy content
-            const nameText = synergy.findByName('NameText');
+            const nameText = synergy.findByName('NameText') as UIElement;
             if (nameText && nameText.element) {
                 nameText.element.text = synergyData.name;
             }
 
-            const countText = synergy.findByName('CountText');
+            const countText = synergy.findByName('CountText') as UIElement;
             if (countText && countText.element) {
                 countText.element.text = `${synergyData.count}`;
             }
 
-            const bonusText = synergy.findByName('BonusText');
+            const bonusText = synergy.findByName('BonusText') as UIElement;
             if (bonusText && bonusText.element) {
                 bonusText.element.text = `Lv${synergyData.bonusLevel}`;
             }
 
             // Update synergy color based on bonus level
-            const synergyBg = synergy.findByName('SynergyBackground');
+            const synergyBg = synergy.findByName('SynergyBackground') as UIElement;
             if (synergyBg && synergyBg.element) {
                 // Set background color based on bonus level
                 const colors = [

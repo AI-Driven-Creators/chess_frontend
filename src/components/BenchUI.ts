@@ -8,6 +8,7 @@
 import { state, ChessPiece } from '../gameState.js';
 import { sendSellChess } from '../utils/apiHelpers.js';
 import { dragDropManager, BenchPosition } from '../utils/dragDrop.js';
+import * as pc from 'playcanvas';
 
 // Define the component attributes
 interface BenchUIAttributes {
@@ -15,6 +16,11 @@ interface BenchUIAttributes {
     cardContainer: pc.Entity;
     sellZone: pc.Entity;
     benchSize: number;
+}
+
+// Add type definitions for UI elements
+interface UIElement extends pc.Entity {
+    element: pc.ElementComponent;
 }
 
 /**
@@ -116,18 +122,18 @@ export class BenchUI extends pc.ScriptType {
                 card.enabled = true;
                 
                 // Update card content
-                const nameText = card.findByName('NameText');
+                const nameText = card.findByName('NameText') as UIElement;
                 if (nameText && nameText.element) {
                     nameText.element.text = chessPiece.chess;
                 }
                 
-                const levelText = card.findByName('LevelText');
+                const levelText = card.findByName('LevelText') as UIElement;
                 if (levelText && levelText.element) {
                     levelText.element.text = `★${chessPiece.level}`;
                 }
                 
                 // Update card background based on level
-                const cardBg = card.findByName('CardBackground');
+                const cardBg = card.findByName('CardBackground') as UIElement;
                 if (cardBg && cardBg.element) {
                     // Set background color based on level
                     const colors = [
@@ -140,7 +146,7 @@ export class BenchUI extends pc.ScriptType {
                 }
                 
                 // Update card image
-                const cardImage = card.findByName('ChessImage');
+                const cardImage = card.findByName('ChessImage') as UIElement;
                 if (cardImage && cardImage.element) {
                     // Set the image based on the chess name
                     // This is a placeholder, you would load actual textures
@@ -172,7 +178,9 @@ export class BenchUI extends pc.ScriptType {
         this.sellZone.element!.on('mouseleave', this.onSellZoneLeave, this);
         
         // Listen for mouse move events on the document
-        this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
+        if (this.app.mouse) {
+            this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.onMouseMove, this);
+        }
     }
 
     /**
@@ -266,7 +274,7 @@ export class BenchUI extends pc.ScriptType {
             this.sellZoneHighlighted = true;
             
             // Highlight the sell zone
-            const sellZoneBg = this.sellZone.findByName('SellZoneBackground');
+            const sellZoneBg = this.sellZone.findByName('SellZoneBackground') as UIElement;
             if (sellZoneBg && sellZoneBg.element) {
                 sellZoneBg.element.color = new pc.Color(0.8, 0.2, 0.2); // Red
             }
@@ -280,7 +288,7 @@ export class BenchUI extends pc.ScriptType {
         this.sellZoneHighlighted = false;
         
         // Reset the sell zone highlight
-        const sellZoneBg = this.sellZone.findByName('SellZoneBackground');
+        const sellZoneBg = this.sellZone.findByName('SellZoneBackground') as UIElement;
         if (sellZoneBg && sellZoneBg.element) {
             sellZoneBg.element.color = new pc.Color(0.5, 0.5, 0.5); // Gray
         }
@@ -297,7 +305,7 @@ export class BenchUI extends pc.ScriptType {
         this.sellZoneHighlighted = false;
         
         // Reset the sell zone highlight
-        const sellZoneBg = this.sellZone.findByName('SellZoneBackground');
+        const sellZoneBg = this.sellZone.findByName('SellZoneBackground') as UIElement;
         if (sellZoneBg && sellZoneBg.element) {
             sellZoneBg.element.color = new pc.Color(0.5, 0.5, 0.5); // Gray
         }

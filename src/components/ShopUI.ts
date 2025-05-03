@@ -7,6 +7,7 @@
 
 import { state, ShopItem } from '../gameState.js';
 import { sendBuyChess, sendRefreshShop, sendLockShop } from '../utils/apiHelpers.js';
+import * as pc from 'playcanvas';
 
 // Define the component attributes
 interface ShopUIAttributes {
@@ -15,6 +16,11 @@ interface ShopUIAttributes {
     lockButton: pc.Entity;
     cardContainer: pc.Entity;
     moneyText: pc.Entity;
+}
+
+// Add type definitions for UI elements
+interface UIElement extends pc.Entity {
+    element: pc.ElementComponent;
 }
 
 /**
@@ -119,24 +125,24 @@ export class ShopUI extends pc.ScriptType {
                 card.enabled = true;
                 
                 // Update card content
-                const nameText = card.findByName('NameText');
+                const nameText = card.findByName('NameText') as UIElement;
                 if (nameText && nameText.element) {
                     nameText.element.text = shopItem.chess;
                 }
                 
-                const levelText = card.findByName('LevelText');
+                const levelText = card.findByName('LevelText') as UIElement;
                 if (levelText && levelText.element) {
                     levelText.element.text = `★${shopItem.level}`;
                 }
                 
                 // Set cost based on level (1-5 gold)
-                const costText = card.findByName('CostText');
+                const costText = card.findByName('CostText') as UIElement;
                 if (costText && costText.element) {
                     costText.element.text = `${shopItem.level}G`;
                 }
                 
                 // Update card background based on level
-                const cardBg = card.findByName('CardBackground');
+                const cardBg = card.findByName('CardBackground') as UIElement;
                 if (cardBg && cardBg.element) {
                     // Set background color based on level
                     // This is just a placeholder, you would use actual textures
@@ -152,7 +158,7 @@ export class ShopUI extends pc.ScriptType {
                 }
                 
                 // Update card image
-                const cardImage = card.findByName('ChessImage');
+                const cardImage = card.findByName('ChessImage') as UIElement;
                 if (cardImage && cardImage.element) {
                     // Set the image based on the chess name
                     // This is a placeholder, you would load actual textures
@@ -185,12 +191,12 @@ export class ShopUI extends pc.ScriptType {
         // Update lock button appearance
         if (this.lockButton && this.lockButton.element) {
             // This is a placeholder, you would use actual textures
-            const lockIcon = this.lockButton.findByName('LockIcon');
+            const lockIcon = this.lockButton.findByName('LockIcon') as UIElement;
             if (lockIcon && lockIcon.element) {
                 lockIcon.element.opacity = locked ? 1 : 0.5;
             }
             
-            const lockText = this.lockButton.findByName('LockText');
+            const lockText = this.lockButton.findByName('LockText') as UIElement;
             if (lockText && lockText.element) {
                 lockText.element.text = locked ? 'Unlock' : 'Lock';
             }

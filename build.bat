@@ -19,7 +19,7 @@ if %ERRORLEVEL% neq 0 (
 echo [成功] 依賴安裝完成
 
 echo 3. 編譯 TypeScript 檔案...
-call npm run build
+call npx vite
 if %ERRORLEVEL% neq 0 (
     echo [錯誤] TypeScript 編譯失敗
     exit /b 1
@@ -30,4 +30,4 @@ echo 4. 啟動開發伺服器...
 echo [提示] 按 Ctrl+C 可停止伺服器
 echo [提示] 伺服器啟動後，請訪問 http://localhost:8080
 echo.
-call npm run start
+call npm run dev

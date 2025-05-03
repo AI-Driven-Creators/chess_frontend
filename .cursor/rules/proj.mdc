@@ -6,22 +6,12 @@ alwaysApply: false
 # 專案規則
 
 ## 專案概述
-這是一個使用 PlayCanvas WebGL 遊戲引擎但不使用 PlayCanvas Editor 的專案。所有 UI 和遊戲邏輯都是通過代碼直接實現的。本專案是一個聯盟戰棋遊戲的前端實現，使用 TypeScript 開發。
+這是一個使用 PlayCanvas WebGL 2.7.4 遊戲引擎但不使用 PlayCanvas Editor 的專案。所有 UI 和遊戲邏輯都是通過代碼直接實現的。本專案是一個聯盟戰棋遊戲的前端實現，使用 TypeScript 開發，使用vite打包。
+
 
 ## 專案結構
 - `src/` - 源代碼目錄
-  - `app.ts` - 主應用入口，負責初始化 PlayCanvas 應用和遊戲場景
-  - `gameState.ts` - 遊戲狀態管理，處理遊戲邏輯和狀態轉換
-  - `websocket.ts` - WebSocket 連接管理，處理與後端的實時通信
-  - `components/` - UI 組件目錄
-# 專案規則
-
-## 專案概述
-這是一個使用 PlayCanvas WebGL 遊戲引擎但不使用 PlayCanvas Editor 的專案。所有 UI 和遊戲邏輯都是通過代碼直接實現的。本專案是一個象棋遊戲的前端實現，使用 TypeScript 開發。
-
-## 專案結構
-- `src/` - 源代碼目錄
-  - `app.ts` - 主應用入口，負責初始化 PlayCanvas 應用和遊戲場景
+  - `main.ts` - 主應用入口，負責初始化 PlayCanvas 應用和遊戲場景
   - `gameState.ts` - 遊戲狀態管理，處理遊戲邏輯和狀態轉換
   - `websocket.ts` - WebSocket 連接管理，處理與後端的實時通信
   - `components/` - UI 組件目錄
