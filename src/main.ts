@@ -9,6 +9,8 @@ import { state, updateState } from './gameState.js';
 import { setupEventListeners, sendCreateGame } from './utils/apiHelpers.js';
 import { setDragDropPlayerId } from './utils/dragDrop.js';
 import * as pc from 'playcanvas';
+import { initSceneManager, SceneType, getSceneManager } from './utils/sceneManager.js';
+import { LobbyUI } from './components/LobbyUI.js';
 
 // Wait for DOM to load
 document.addEventListener('DOMContentLoaded', function() {
@@ -65,11 +67,16 @@ function initializeApp(): void {
 
     // Load Font
     const fntUrl = 'assets/fonts/chinese.json';
+    
+    // Initialize scene manager
+    const sceneManager = initSceneManager(app);
+    
     app.assets.loadFromUrl(fntUrl, 'font', (err, fontAsset) => {
         if (err) {
             console.error('Failed to load chinese.json', err);
             return;
         }
+        
         // Create UI root entity
         const uiRoot = new pc.Entity('UI Root');
         uiRoot.addComponent('screen', {
@@ -674,6 +681,24 @@ function initializeApp(): void {
             };
         }
 
+        // Create lobby scene
+        const lobbyScene = new LobbyUI(app);
+        app.root.addChild(lobbyScene);
+        
+        // Create game scene
+        const gameScene = new pc.Entity('GameScene');
+        app.root.addChild(gameScene);
+        
+        // Move existing UI elements to game scene
+        gameScene.addChild(uiRoot);
+        
+        // Register scenes
+        sceneManager.registerScene(SceneType.LOBBY, lobbyScene);
+        sceneManager.registerScene(SceneType.GAME, gameScene);
+        
+        // Default show lobby scene
+        sceneManager.switchToScene(SceneType.LOBBY);
+        
         // Start the application
         app.start();
         
@@ -682,6 +707,18 @@ function initializeApp(): void {
         if (loadingScreen) {
             loadingScreen.style.display = 'none';
         }
+
+        app.on('switchToGame', () => {
+            console.log('收到 switchToGame 事件');
+            
+            // 先清理大廳場景的 HTML 元素
+            if (lobbyScene instanceof LobbyUI && typeof lobbyScene.destroy === 'function') {
+                lobbyScene.destroy();
+            }
+            
+            // 然後切換場景
+            sceneManager.switchToScene(SceneType.GAME);
+        });
     });
 }
 
@@ -731,6 +768,14 @@ function setupWebSocket(): void {
         // Simulate a game state
         simulateGameState();
     }, 1000);
+
+    // Add CreateGameResult event listener
+    webSocketManager.on('CreateGameResult', (payload) => {
+        if (payload.success) {
+            console.log('遊戲創建成功:', payload);
+            // Lobby scene has already handled scene switch
+        }
+    });
 }
 
 /**
