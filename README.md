@@ -25,12 +25,7 @@
 npm install
 ```
 
-### 開發伺服器
-```bash
-npm run dev
-```
-
-### 建置專案
+### 開發專案
 ```bash
 npx vite
 ```

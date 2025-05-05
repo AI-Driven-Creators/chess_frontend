@@ -1,6 +1,6 @@
 /**
  * Main Application Entry Point
- * 
+ *
  * Initializes the PlayCanvas application and sets up the game components.
  */
 
@@ -10,10 +10,12 @@ import { setupEventListeners, sendCreateGame } from './utils/apiHelpers.js';
 import { setDragDropPlayerId } from './utils/dragDrop.js';
 import * as pc from 'playcanvas';
 import { initSceneManager, SceneType, getSceneManager } from './utils/sceneManager.js';
-import { LobbyUI } from './components/LobbyUI.js';
+import { BoardUI } from './components/BoardUI';
+import { LobbyUI } from './components/LobbyUI';
 
 // Wait for DOM to load
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM 已加載，初始化應用程序...");
     // Initialize the application
     initializeApp();
 });
@@ -22,17 +24,23 @@ document.addEventListener('DOMContentLoaded', function() {
  * Initializes the PlayCanvas application
  */
 function initializeApp(): void {
+    console.log("初始化應用程序...");
+    
     // Get canvas element
     const canvas = document.getElementById('application-canvas');
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        console.error('Canvas 元素未找到或不是有效的 HTMLCanvasElement');
         throw new Error('Canvas element not found or is not a valid HTMLCanvasElement');
     }
+    console.log("Canvas 元素已找到");
 
     // Create PlayCanvas application
+    console.log("創建 PlayCanvas 應用程序...");
     const app = new pc.Application(canvas, {});
     app.keyboard = new pc.Keyboard(window);
     app.mouse = new pc.Mouse(canvas);
     app.touch = new pc.TouchDevice(canvas);
+    console.log("PlayCanvas 應用程序已創建");
     
     // Set canvas to fill window
     app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
@@ -54,7 +62,7 @@ function initializeApp(): void {
     camera.setPosition(0, 0, 10);
     app.root.addChild(camera);
     
-    // Create light entity
+    // Create light entity for 3D board
     const light = new pc.Entity('Light');
     light.addComponent('light', {
         type: 'directional',
@@ -64,6 +72,27 @@ function initializeApp(): void {
     });
     light.setEulerAngles(45, 0, 0);
     app.root.addChild(light);
+    
+    // Add additional lights for 3D board
+    const fillLight = new pc.Entity('FillLight');
+    fillLight.addComponent('light', {
+        type: 'directional',
+        color: new pc.Color(0.7, 0.7, 0.8),
+        castShadows: false,
+        intensity: 0.7
+    });
+    fillLight.setEulerAngles(30, 135, 0);
+    app.root.addChild(fillLight);
+    
+    const backLight = new pc.Entity('BackLight');
+    backLight.addComponent('light', {
+        type: 'directional',
+        color: new pc.Color(0.8, 0.7, 0.7),
+        castShadows: false,
+        intensity: 0.5
+    });
+    backLight.setEulerAngles(30, -135, 0);
+    app.root.addChild(backLight);
 
     // Load Font
     const fntUrl = 'assets/fonts/chinese.json';
@@ -85,7 +114,6 @@ function initializeApp(): void {
         });
         app.root.addChild(uiRoot);
         
-        // Create UI containers
         // Create UI containers with visible borders and labels
         const shopContainer = new pc.Entity('Shop Container');
         shopContainer.addComponent('element', {
@@ -120,36 +148,43 @@ function initializeApp(): void {
         shopContainer.addChild(shopLabel);
         uiRoot.addChild(shopContainer);
         
+        // Create a 3D board container
         const boardContainer = new pc.Entity('Board Container');
-        boardContainer.addComponent('element', {
-            type: 'image',
-            anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
-            pivot: new pc.Vec2(0.5, 0.5),
-            width: 800,
-            height: 400,
-            color: new pc.Color(0.3, 0.3, 0.3, 0.5),
-            useInput: true
-        });
         
-        // Add label to board container
+        // Position the board container in 3D space
+        boardContainer.setLocalPosition(0, -2, 0);
+        
+        // Add a label above the 3D board
         const boardLabel = new pc.Entity('Board Label');
         boardLabel.addComponent('element', {
             type: 'text',
-            anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
-            pivot: new pc.Vec2(0.5, 0.5),
+            anchor: new pc.Vec4(0.5, 0, 0.5, 0),
+            pivot: new pc.Vec2(0.5, 0),
             width: 200,
             height: 50,
             fontSize: 24,
             color: new pc.Color(1, 1, 1),
-            text: '棋盤 (Board)',
+            text: '六角棋盤 (Hex Board)',
             fontAsset: fontAsset,
             textAlign: 'center',
             autoWidth: false,
             autoHeight: false,
             enabled: true
         });
+        
+        // Position the label above the board
+        boardLabel.setLocalPosition(0, 3, 0);
+        
+        // Make the label face the camera
+        boardLabel.addComponent('script');
+        boardLabel.script!.create('billboard', {
+            attributes: {
+                camera: camera
+            }
+        });
+        
         boardContainer.addChild(boardLabel);
-        uiRoot.addChild(boardContainer);
+        app.root.addChild(boardContainer);
         
         const benchContainer = new pc.Entity('Bench Container');
         benchContainer.addComponent('element', {
@@ -579,20 +614,82 @@ function initializeApp(): void {
                 benchSize: 9
             };
         }
-        
+        pc.registerScript(BoardUI, 'boardUI');
+
+        BoardUI.attributes.add('cellTemplate', { type: 'entity' });
+        BoardUI.attributes.add('pieceTemplate', { type: 'entity' });
+        BoardUI.attributes.add('boardContainer', { type: 'entity' });
+        BoardUI.attributes.add('boardRadius', { type: 'number', default: 3 });
+        BoardUI.attributes.add('cellSize', { type: 'number', default: 1.2 });
+        console.log("創建 BoardUI 組件...");
+        // 直接創建 BoardUI 組件
         const boardUI = new pc.Entity('BoardUI');
-        const boardScript = boardUI.addComponent('script');
-        if (boardScript) {
-            boardScript.enabled = true;
-            (boardScript as any).attributes = {
+        boardUI.addComponent('script');
+        boardUI.script.create('boardUI', {
+            attributes: {
                 cellTemplate: boardCellTemplate,
                 pieceTemplate: boardPieceTemplate,
                 boardContainer: boardContainer,
-                boardWidth: 8,
-                boardHeight: 3,
-                cellSize: 80
-            };
-        }
+                boardRadius: 3,
+                cellSize: 1.2
+            }
+        });
+        
+        // 添加 BoardUI 到場景
+        app.root.addChild(boardUI);
+        console.log("BoardUI 已添加到場景");
+        
+        // 添加一個調試按鈕，用於手動初始化 BoardUI
+        const debugButton = new pc.Entity('DebugButton');
+        debugButton.addComponent('element', {
+            type: 'image',
+            anchor: new pc.Vec4(0, 0, 0, 0),
+            pivot: new pc.Vec2(0, 0),
+            width: 150,
+            height: 40,
+            color: new pc.Color(1, 0, 0, 0.8),
+            useInput: true
+        });
+        
+        const debugText = new pc.Entity('DebugText');
+        debugText.addComponent('element', {
+            type: 'text',
+            anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
+            pivot: new pc.Vec2(0.5, 0.5),
+            fontSize: 16,
+            color: new pc.Color(1, 1, 1),
+            text: '初始化六角棋盤',
+            fontAsset: fontAsset,
+            textAlign: 'center',
+            autoWidth: false,
+            autoHeight: false,
+            enabled: true
+        });
+        debugButton.addChild(debugText);
+        uiRoot.addChild(debugButton);
+        
+        // 添加點擊事件
+        debugButton.element!.on('click', function() {
+            console.log("手動初始化六角棋盤...");
+            // 重新創建 BoardUI
+            boardUI.destroy();
+            
+            const newBoardUI = new pc.Entity('BoardUI');
+            const newBoardScript = newBoardUI.addComponent('script');
+            if (newBoardScript) {
+                newBoardScript.enabled = true;
+                (newBoardScript as any).create = 'boardUI';
+                (newBoardScript as any).attributes = {
+                    cellTemplate: boardCellTemplate,
+                    pieceTemplate: boardPieceTemplate,
+                    boardContainer: boardContainer,
+                    boardRadius: 3,
+                    cellSize: 1.2
+                };
+                app.root.addChild(newBoardUI);
+                console.log("新的 BoardUI 已添加到場景");
+            }
+        });
         
         // Create synergy template for info panel
         const synergyTemplate = new pc.Entity('SynergyTemplate');

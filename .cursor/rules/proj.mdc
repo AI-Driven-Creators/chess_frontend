@@ -102,7 +102,7 @@ alwaysApply: true
    - Node.js 16.x 或更高版本
    - npm 8.x 或更高版本
 2. 構建命令：
-   - 開發環境：`npm run dev`
+   - 開發環境：`npx vite`
    - 生產環境：`npm run build`
 3. 運行環境：
    - 現代瀏覽器（Chrome、Firefox、Safari、Edge）

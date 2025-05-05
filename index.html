@@ -62,6 +62,37 @@
     </div>
     <canvas id="application-canvas"></canvas>
 
+    <!-- Debug Info -->
+    <div id="debug-info" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 10px; font-family: monospace; z-index: 1000;">
+        Loading debug info...
+    </div>
+
+    <script>
+        // 顯示調試信息
+        console.originalLog = console.log;
+        console.log = function() {
+            console.originalLog.apply(console, arguments);
+            
+            // 獲取調試信息元素
+            const debugInfo = document.getElementById('debug-info');
+            if (debugInfo) {
+                // 添加新的日誌
+                const args = Array.from(arguments).join(' ');
+                const logLine = document.createElement('div');
+                logLine.textContent = args;
+                
+                // 限制顯示的行數
+                if (debugInfo.children.length > 20) {
+                    debugInfo.removeChild(debugInfo.firstChild);
+                }
+                
+                debugInfo.appendChild(logLine);
+            }
+        };
+        
+        console.log("頁面加載中...");
+    </script>
+
     <!-- Main App Script -->
     <script type="module" src="/src/main.ts"></script>
 </body>

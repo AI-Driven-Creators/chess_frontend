@@ -346,12 +346,3 @@ export class BenchUI extends pc.ScriptType {
         return null;
     }
 }
-
-// Register the script with PlayCanvas
-pc.registerScript(BenchUI, 'benchUI');
-
-// Define the component attributes
-BenchUI.attributes!.add('cardTemplate', { type: 'entity' });
-BenchUI.attributes!.add('cardContainer', { type: 'entity' });
-BenchUI.attributes!.add('sellZone', { type: 'entity' });
-BenchUI.attributes!.add('benchSize', { type: 'number', default: 9 });
