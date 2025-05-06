@@ -154,12 +154,3 @@ export class ActionButtonPanel extends pc.ScriptType {
         // You could add particle effects, screen flash, or other visual feedback here
     }
 }
-
-// Register the script with PlayCanvas
-pc.registerScript(ActionButtonPanel, 'actionButtonPanel');
-
-// Define the component attributes
-ActionButtonPanel.attributes!.add('buyXPButton', { type: 'entity' });
-ActionButtonPanel.attributes!.add('xpProgressBar', { type: 'entity' });
-ActionButtonPanel.attributes!.add('xpText', { type: 'entity' });
-ActionButtonPanel.attributes!.add('levelText', { type: 'entity' });

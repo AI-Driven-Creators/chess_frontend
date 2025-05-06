@@ -260,13 +260,3 @@ export class ShopUI extends pc.ScriptType {
         this.updateLockStatus(locked);
     }
 }
-
-// Register the script with PlayCanvas
-pc.registerScript(ShopUI, 'shopUI');
-
-// Define the component attributes
-ShopUI.attributes!.add('cardTemplate', { type: 'entity' });
-ShopUI.attributes!.add('refreshButton', { type: 'entity' });
-ShopUI.attributes!.add('lockButton', { type: 'entity' });
-ShopUI.attributes!.add('cardContainer', { type: 'entity' });
-ShopUI.attributes!.add('moneyText', { type: 'entity' });

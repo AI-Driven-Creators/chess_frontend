@@ -12,6 +12,10 @@ import * as pc from 'playcanvas';
 import { initSceneManager, SceneType, getSceneManager } from './utils/sceneManager.js';
 import { BoardUI } from './components/BoardUI';
 import { LobbyUI } from './components/LobbyUI';
+import { ShopUI } from './components/ShopUI';
+import { ActionButtonPanel } from './components/ActionButtonPanel';
+import { InfoPanel } from './components/InfoPanel';
+import { BenchUI } from './components/BenchUI';
 
 // Wait for DOM to load
 document.addEventListener('DOMContentLoaded', function() {
@@ -589,19 +593,29 @@ function initializeApp(): void {
         });
         actionButtonContainer.addChild(levelText);
         
-        // Create UI components with script components
+        // 初始化 ShopUI
+        pc.registerScript(ShopUI, 'shopUI');
+        ShopUI.attributes.add('cardTemplate', { type: 'entity' });
+        ShopUI.attributes.add('refreshButton', { type: 'entity' });
+        ShopUI.attributes.add('lockButton', { type: 'entity' });
+        ShopUI.attributes.add('cardContainer', { type: 'entity' });
+        ShopUI.attributes.add('moneyText', { type: 'entity' });
+        // 創建 ShopUI 組件
+        console.log("創建 ShopUI 組件...");
         const shopUI = new pc.Entity('ShopUI');
-        const shopScript = shopUI.addComponent('script');
-        if (shopScript) {
-            shopScript.enabled = true;
-            (shopScript as any).attributes = {
+        shopUI.addComponent('script');
+        shopUI.script.create('shopUI', {
+            attributes: {
                 cardTemplate: shopCardTemplate,
                 refreshButton: refreshButton,
                 lockButton: lockButton,
                 cardContainer: shopContainer,
                 moneyText: moneyText
-            };
-        }
+            }
+        });
+        // 添加 ShopUI 到場景
+        app.root.addChild(shopUI);
+        console.log("ShopUI 已添加到場景");
         
         const benchUI = new pc.Entity('BenchUI');
         const benchScript = benchUI.addComponent('script');
@@ -614,15 +628,15 @@ function initializeApp(): void {
                 benchSize: 9
             };
         }
+        // 初始化 BoardUI
         pc.registerScript(BoardUI, 'boardUI');
-
         BoardUI.attributes.add('cellTemplate', { type: 'entity' });
         BoardUI.attributes.add('pieceTemplate', { type: 'entity' });
         BoardUI.attributes.add('boardContainer', { type: 'entity' });
         BoardUI.attributes.add('boardRadius', { type: 'number', default: 3 });
         BoardUI.attributes.add('cellSize', { type: 'number', default: 1.2 });
+        // 創建 BoardUI 組件
         console.log("創建 BoardUI 組件...");
-        // 直接創建 BoardUI 組件
         const boardUI = new pc.Entity('BoardUI');
         boardUI.addComponent('script');
         boardUI.script.create('boardUI', {
@@ -634,7 +648,6 @@ function initializeApp(): void {
                 cellSize: 1.2
             }
         });
-        
         // 添加 BoardUI 到場景
         app.root.addChild(boardUI);
         console.log("BoardUI 已添加到場景");
@@ -751,32 +764,51 @@ function initializeApp(): void {
         synergyTemplate.enabled = false;
         infoPanelContainer.addChild(synergyTemplate);
         
-        // Create info panel UI
+        // 初始化 InfoPanel
+        pc.registerScript(InfoPanel, 'infoPanel');
+        InfoPanel.attributes.add('moneyText', { type: 'entity' });
+        InfoPanel.attributes.add('levelText', { type: 'entity' });
+        InfoPanel.attributes.add('xpText', { type: 'entity' });
+        InfoPanel.attributes.add('synergiesContainer', { type: 'entity' });
+        InfoPanel.attributes.add('synergyTemplate', { type: 'entity' });
+        // 創建 InfoPanel 組件
+        console.log("創建 InfoPanel 組件...");
         const infoPanel = new pc.Entity('InfoPanel');
-        const infoScript = infoPanel.addComponent('script');
-        if (infoScript) {
-            infoScript.enabled = true;
-            (infoScript as any).attributes = {
+        infoPanel.addComponent('script');
+        infoPanel.script.create('infoPanel', {
+            attributes: {
                 moneyText: moneyText,
                 levelText: levelText,
                 xpText: xpText,
                 synergiesContainer: infoPanelContainer,
                 synergyTemplate: synergyTemplate
-            };
-        }
+            }
+        });
+        // 添加 InfoPanel 到場景
+        app.root.addChild(infoPanel);
+        console.log("InfoPanel 已添加到場景");
         
-        // Create action button panel UI
+        // 初始化 ActionButtonPanel
+        pc.registerScript(ActionButtonPanel, 'actionButtonPanel');
+        ActionButtonPanel.attributes.add('buyXPButton', { type: 'entity' });
+        ActionButtonPanel.attributes.add('xpProgressBar', { type: 'entity' });
+        ActionButtonPanel.attributes.add('xpText', { type: 'entity' });
+        ActionButtonPanel.attributes.add('levelText', { type: 'entity' });
+        // 創建 ActionButtonPanel 組件
+        console.log("創建 ActionButtonPanel 組件...");
         const actionButtonPanel = new pc.Entity('ActionButtonPanel');
-        const actionScript = actionButtonPanel.addComponent('script');
-        if (actionScript) {
-            actionScript.enabled = true;
-            (actionScript as any).attributes = {
+        actionButtonPanel.addComponent('script');
+        actionButtonPanel.script.create('actionButtonPanel', {
+            attributes: {
                 buyXPButton: buyXPButton,
                 xpProgressBar: xpProgressBar,
                 xpText: xpText,
                 levelText: levelText
-            };
-        }
+            }
+        });
+        // 添加 ActionButtonPanel 到場景
+        app.root.addChild(actionButtonPanel);
+        console.log("ActionButtonPanel 已添加到場景");
 
         // Create lobby scene
         const lobbyScene = new LobbyUI(app);

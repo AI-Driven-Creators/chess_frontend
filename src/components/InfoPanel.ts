@@ -156,13 +156,3 @@ export class InfoPanel extends pc.ScriptType {
         });
     }
 }
-
-// Register the script with PlayCanvas
-pc.registerScript(InfoPanel, 'infoPanel');
-
-// Define the component attributes
-InfoPanel.attributes!.add('moneyText', { type: 'entity' });
-InfoPanel.attributes!.add('levelText', { type: 'entity' });
-InfoPanel.attributes!.add('xpText', { type: 'entity' });
-InfoPanel.attributes!.add('synergiesContainer', { type: 'entity' });
-InfoPanel.attributes!.add('synergyTemplate', { type: 'entity' });
