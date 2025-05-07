@@ -644,7 +644,7 @@ function initializeApp(): void {
                 cellTemplate: boardCellTemplate,
                 pieceTemplate: boardPieceTemplate,
                 boardContainer: boardContainer,
-                boardRadius: 3,
+                boardRadius: 6,
                 cellSize: 1.2
             }
         });
@@ -683,25 +683,7 @@ function initializeApp(): void {
         
         // 添加點擊事件
         debugButton.element!.on('click', function() {
-            console.log("手動初始化六角棋盤...");
-            // 重新創建 BoardUI
-            boardUI.destroy();
-            
-            const newBoardUI = new pc.Entity('BoardUI');
-            const newBoardScript = newBoardUI.addComponent('script');
-            if (newBoardScript) {
-                newBoardScript.enabled = true;
-                (newBoardScript as any).create = 'boardUI';
-                (newBoardScript as any).attributes = {
-                    cellTemplate: boardCellTemplate,
-                    pieceTemplate: boardPieceTemplate,
-                    boardContainer: boardContainer,
-                    boardRadius: 3,
-                    cellSize: 1.2
-                };
-                app.root.addChild(newBoardUI);
-                console.log("新的 BoardUI 已添加到場景");
-            }
+            console.log('Debug button clicked!');
         });
         
         // Create synergy template for info panel

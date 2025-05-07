@@ -45,7 +45,7 @@ export class BoardUI extends pc.ScriptType {
     public cellTemplate!: pc.Entity;
     public pieceTemplate!: pc.Entity;
     public boardContainer!: pc.Entity;
-    public boardRadius: number = 3; // Radius of the hex grid (distance from center)
+    public boardRadius: number = 12; // Radius of the hex grid (distance from center)
     public cellSize: number = 1.2; // Size of each hexagonal cell
 
     // Component properties
@@ -247,12 +247,7 @@ export class BoardUI extends pc.ScriptType {
         this.boardContainer.addChild(cell);
         
         // Create a hexagonal model for the cell
-        const hexMesh = this.createHexagonMesh();
-        cell.addComponent('model', {
-            type: 'box', // Use a box model initially
-            castShadows: false,
-            receiveShadows: true
-        });
+        const hexMesh = this.createHexPrismMesh();
         
         // Add a material to the cell
         const material = new pc.StandardMaterial();
@@ -270,12 +265,11 @@ export class BoardUI extends pc.ScriptType {
         material.update();
         
         // Apply material to the model
-        if (cell.model && cell.model.meshInstances && cell.model.meshInstances.length > 0) {
-            cell.model.meshInstances[0].material = material;
-            console.log(`已應用材質到單元格: ${colorSum === 0 ? '淺灰' : colorSum === 1 ? '中灰' : '深灰'}`);
-        } else {
-            console.warn(`無法應用材質到單元格: HexCell_${q}_${r}_${s}，meshInstances 不可用`);
-        }
+        const meshInstance = new pc.MeshInstance(hexMesh, material);
+
+        cell.addComponent('render', {
+            meshInstances: [meshInstance]
+        });
         
         // Position the cell
         const position = this.hexToWorld(q, r, s);
@@ -306,6 +300,80 @@ export class BoardUI extends pc.ScriptType {
         cell.collision!.on('mouseup', (event: any) => this.onCellMouseUp(q, r, s, event), this);
         
         return cell;
+    }
+    
+    private createHexPrismMesh(): pc.Mesh {
+        const app = this.app;
+        const device = app.graphicsDevice;
+    
+        const radius = this.cellSize * 0.9;
+        const height = 0.3;
+    
+        const vertices: number[] = [];
+        const normals: number[] = [];
+        const indices: number[] = [];
+        const uvs: number[] = [];
+    
+        // 頂部與底部六邊形，共 12 個邊緣點
+        for (let y of [height / 2, -height / 2]) {
+            for (let i = 0; i < 7; i++) {
+                const angle = (Math.PI / 3) * i + Math.PI / 6;
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                vertices.push(x, y, z);
+                normals.push(0, y > 0 ? 1 : -1, 0);
+                uvs.push((x / radius + 1) / 2, (z / radius + 1) / 2);
+            }
+            // 中心點
+            vertices.push(0, y, 0);
+            normals.push(0, y > 0 ? 1 : -1, 0);
+            uvs.push(0.5, 0.5);
+        }
+    
+        const topOffset = 0;
+        const bottomOffset = 7;
+    
+        // 頂部面（三角扇）
+        for (let i = 0; i < 8; i++) {
+            indices.push(topOffset + 6, topOffset + i, topOffset + ((i - 1) % 6));
+        }
+    
+        // 底部面（三角扇）
+        for (let i = 0; i < 6; i++) {
+            indices.push(bottomOffset + 6, bottomOffset + ((i + 1) % 6), bottomOffset + i);
+        }
+    
+        // 側面（6 個矩形 -> 12 個三角形）
+        for (let i = 0; i < 6; i++) {
+            const topA = topOffset + i;
+            const topB = topOffset + ((i + 1) % 6);
+            const botA = bottomOffset + i;
+            const botB = bottomOffset + ((i + 1) % 6);
+    
+            // 三角形 1
+            indices.push(topA, botA, botB);
+            // 三角形 2
+            indices.push(topA, botB, topB);
+    
+            // 側面頂點法線需為水平向外（略微簡化）
+            const angle = (Math.PI / 3) * (i + 0.5);
+            const nx = Math.cos(angle);
+            const nz = Math.sin(angle);
+            for (let j = 0; j < 2; j++) {
+                normals.push(nx, 0, nz); // botA
+                normals.push(nx, 0, nz); // botB
+            }
+            // 這裡簡化：未針對側面額外產生頂點，而是與上下共用，若要精準光照可額外建邊緣頂點群
+        }
+    
+        const mesh = new pc.Mesh(device);
+        mesh.setPositions(vertices);
+        mesh.setNormals(normals);
+        mesh.setUvs(0, uvs);
+        mesh.setIndices(indices);
+        mesh.update();
+    
+        return mesh;
     }
     
     /**
