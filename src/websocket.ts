@@ -5,6 +5,8 @@
  * Automatically converts messages to/from JSON according to the GAME_API.md format.
  */
 
+import { updateXP } from "./gameState";
+
 type MessageCallback = (payload: any) => void;
 
 export class WebSocketManager {
@@ -165,3 +167,9 @@ export class WebSocketManager {
 
 // Create a singleton instance for global use
 export const webSocketManager = new WebSocketManager('ws://localhost:8080');
+
+webSocketManager.on('XPUpdatedNotice', (payload) => {
+  console.log('XP updated:', payload);
+  // 更新遊戲狀態
+  updateXP(payload.xp, payload.level);
+});

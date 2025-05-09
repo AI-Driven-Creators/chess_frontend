@@ -518,7 +518,8 @@ function initializeApp(): void {
             pivot: new pc.Vec2(0.5, 0.5),
             width: 150,
             height: 50,
-            color: new pc.Color(0.2, 0.4, 0.8, 0.8)
+            color: new pc.Color(0.2, 0.4, 0.8, 0.8),
+            useInput: true
         });
         
         const buyXPText = new pc.Entity('BuyXPText');
@@ -810,6 +811,8 @@ function initializeApp(): void {
         // Default show lobby scene
         sceneManager.switchToScene(SceneType.LOBBY);
         
+        uiRoot.addChild(actionButtonPanel);
+
         // Start the application
         app.start();
         
