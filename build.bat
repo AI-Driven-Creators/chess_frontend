@@ -1,5 +1,3 @@
-chcp 65001
-
 @echo off
 echo === 自走棋模擬器前端框架構建腳本 ===
 echo.

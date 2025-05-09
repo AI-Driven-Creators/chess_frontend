@@ -39,7 +39,6 @@ export class ActionButtonPanel extends pc.ScriptType {
      * Initialize the component
      */
     public initialize(): void {
-        console.log('ActionButtonPanel initialized');
         // Set up button click handlers
         this.buyXPButton.element!.on('click', this.onBuyXPClick, this);
 
@@ -72,8 +71,6 @@ export class ActionButtonPanel extends pc.ScriptType {
      * Handles clicking on the Buy XP button
      */
     private onBuyXPClick(): void {
-        console.log('Buy XP button clicked');
-
         // Buy XP
         sendBuyXP(state.playerId)
             .catch(error => console.error('Error buying XP:', error));

@@ -110,8 +110,9 @@ export async function sendSellChess(playerId: string, unitId: string): Promise<v
  * @param playerId The player ID
  */
 export async function sendBuyXP(playerId: string): Promise<void> {
-  console.log('sendBuyXP called', playerId);
-  await webSocketManager.send('BuyXP', { playerId });
+  await webSocketManager.send('BuyXP', {
+    playerId
+  });
 }
 
 /**
