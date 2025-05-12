@@ -4,6 +4,8 @@
  * Defines the game state data model and provides a singleton instance for global access.
  * Includes money, level, xp, shop, bench, board, synergies, etc.
  */
+import * as pc from 'playcanvas';
+declare const app: pc.Application;
 
 // Type definitions for chess pieces and game state
 export interface ChessPiece {
@@ -79,13 +81,59 @@ export function resetState(): void {
   Object.assign(state, initialState);
 }
 
+// 定義事件回調函數的類型
+type EventCallback = (data: any) => void;
+
+// 創建一個事件發送器
+const eventEmitter = {
+  listeners: new Map<string, EventCallback[]>(),
+  
+  on(event: string, callback: EventCallback) {
+      if (!this.listeners.has(event)) {
+          this.listeners.set(event, []);
+      }
+      this.listeners.get(event)!.push(callback);
+  },
+  
+  off(event: string, callback: EventCallback) {
+      if (!this.listeners.has(event)) return;
+      const callbacks = this.listeners.get(event)!;
+      const index = callbacks.indexOf(callback);
+      if (index !== -1) {
+          callbacks.splice(index, 1);
+      }
+  },
+  
+  fire(event: string, data: any) {
+      if (!this.listeners.has(event)) return;
+      this.listeners.get(event)!.forEach(callback => callback(data));
+  }
+};
+
 /**
  * Updates the game state with new values
  * @param newState The new state values to merge
  */
 export function updateState(newState: Partial<GameState>): void {
+  const oldState = { ...state };
   Object.assign(state, newState);
+  
+  // 使用事件發送器觸發事件
+  if (newState.xp && (newState.xp.current !== oldState.xp.current || newState.xp.required !== oldState.xp.required)) {
+      eventEmitter.fire('state:xp:updated', newState.xp);
+  }
+  
+  if (newState.level && newState.level !== oldState.level) {
+      eventEmitter.fire('state:level:updated', newState.level);
+  }
+  
+  if (newState.money !== undefined && newState.money !== oldState.money) {
+      eventEmitter.fire('state:money:updated', newState.money);
+  }
 }
+
+// 導出事件發送器
+export { eventEmitter };
 
 /**
  * Updates the shop with new items

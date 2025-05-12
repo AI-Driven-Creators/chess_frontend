@@ -16,6 +16,8 @@ import { ShopUI } from './components/ShopUI';
 import { ActionButtonPanel } from './components/ActionButtonPanel';
 import { InfoPanel } from './components/InfoPanel';
 import { BenchUI } from './components/BenchUI';
+import { eventEmitter } from './gameState.js';
+
 
 // Wait for DOM to load
 document.addEventListener('DOMContentLoaded', function() {
@@ -518,8 +520,22 @@ function initializeApp(): void {
             pivot: new pc.Vec2(0.5, 0.5),
             width: 150,
             height: 50,
+            color: new pc.Color(0.2, 0.4, 0.8, 0.8),
+            useInput: true,
+            enabled: true
+        });
+
+        // 添加按鈕背景
+        const buttonBg = new pc.Entity('BuyXPButtonBackground');
+        buttonBg.addComponent('element', {
+            type: 'image',
+            anchor: new pc.Vec4(0, 0, 1, 1),
+            pivot: new pc.Vec2(0.5, 0.5),
+            width: 150,
+            height: 50,
             color: new pc.Color(0.2, 0.4, 0.8, 0.8)
         });
+        buyXPButton.addChild(buttonBg);
         
         const buyXPText = new pc.Entity('BuyXPText');
         buyXPText.addComponent('element', {
@@ -531,9 +547,9 @@ function initializeApp(): void {
             text: '購買 XP (4G)',
             fontAsset: fontAsset,
             textAlign: 'center',
-            autoWidth: false,
-            autoHeight: false,
-            enabled: true
+            // autoWidth: false,
+            // autoHeight: false,
+            // enabled: true
         });
         buyXPButton.addChild(buyXPText);
         actionButtonContainer.addChild(buyXPButton);
@@ -800,6 +816,9 @@ function initializeApp(): void {
         app.root.addChild(actionButtonPanel);
         console.log("ActionButtonPanel 已添加到場景");
 
+        // 設置 WebSocket 連接
+        setupWebSocket();
+
         // Create lobby scene
         const lobbyScene = new LobbyUI(app);
         app.root.addChild(lobbyScene);
@@ -838,6 +857,51 @@ function initializeApp(): void {
             // 然後切換場景
             sceneManager.switchToScene(SceneType.GAME);
         });
+
+        // Set up event listeners
+        setupEventListeners({
+            onGetGameStateResult: (payload) => {
+                if (payload.success) {
+                    updateState(payload.state);
+                }
+            },
+            onBuyXPResult: (payload) => {
+                if (payload.success) {
+                    // 更新金錢和經驗值
+                    state.money = payload.money;
+                    state.xp = payload.xp;
+                    // 觸發經驗值更新事件
+                    app.fire('state:xp:updated', state.xp);
+                } else {
+                    console.error('購買經驗值失敗:', payload.reason);
+                }
+            },
+            onXPUpdatedNotice: (payload) => {
+                // 更新經驗值
+                state.xp = payload.xp;
+                // 觸發經驗值更新事件
+                app.fire('state:xp:updated', state.xp);
+            },
+            onLevelUpNotice: (payload) => {
+                // 更新等級
+                state.level = payload.level;
+                // 觸發等級更新事件
+                app.fire('state:level:updated', state.level);
+            }
+        });
+    });
+
+    // 連接事件發送器到 PlayCanvas app
+    eventEmitter.on('state:xp:updated', (xp) => {
+        app.fire('state:xp:updated', xp);
+    });
+    
+    eventEmitter.on('state:level:updated', (level) => {
+        app.fire('state:level:updated', level);
+    });
+    
+    eventEmitter.on('state:money:updated', (money) => {
+        app.fire('state:money:updated', money);
     });
 }
 
@@ -908,7 +972,7 @@ function simulateGameState(): void {
         round: 1,
         money: 10,
         level: 3,
-        xp: { current: 2, required: 6 },
+        xp: { current: 8, required: 6 },
         shop: [
             { chess: 'Knight', level: 1 },
             { chess: 'Mage', level: 1 },
@@ -935,5 +999,5 @@ function simulateGameState(): void {
     // Update the game state
     updateState(simulatedState);
     
-    console.log('Simulated game state:', state);
+    console.log('模擬遊戲狀態:', state);
 }
