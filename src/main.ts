@@ -603,16 +603,18 @@ function initializeApp(): void {
         // 創建 ShopUI 組件
         console.log("創建 ShopUI 組件...");
         const shopUI = new pc.Entity('ShopUI');
-        shopUI.addComponent('script');
-        shopUI.script.create('shopUI', {
-            attributes: {
-                cardTemplate: shopCardTemplate,
-                refreshButton: refreshButton,
-                lockButton: lockButton,
-                cardContainer: shopContainer,
-                moneyText: moneyText
-            }
-        });
+        const shopScript = shopUI.addComponent('script') as pc.ScriptComponent;
+        if (shopScript) {
+            shopScript.create('shopUI', {
+                attributes: {
+                    cardTemplate: shopCardTemplate,
+                    refreshButton: refreshButton,
+                    lockButton: lockButton,
+                    cardContainer: shopContainer,
+                    moneyText: moneyText
+                }
+            });
+        }
         // 添加 ShopUI 到場景
         app.root.addChild(shopUI);
         console.log("ShopUI 已添加到場景");
@@ -638,16 +640,18 @@ function initializeApp(): void {
         // 創建 BoardUI 組件
         console.log("創建 BoardUI 組件...");
         const boardUI = new pc.Entity('BoardUI');
-        boardUI.addComponent('script');
-        boardUI.script.create('boardUI', {
-            attributes: {
-                cellTemplate: boardCellTemplate,
-                pieceTemplate: boardPieceTemplate,
-                boardContainer: boardContainer,
-                boardRadius: 6,
-                cellSize: 1.2
-            }
-        });
+        const boardScript = boardUI.addComponent('script') as pc.ScriptComponent;
+        if (boardScript) {
+            boardScript.create('boardUI', {
+                attributes: {
+                    cellTemplate: boardCellTemplate,
+                    pieceTemplate: boardPieceTemplate,
+                    boardContainer: boardContainer,
+                    boardRadius: 6,
+                    cellSize: 1.2
+                }
+            });
+        }
         // 添加 BoardUI 到場景
         app.root.addChild(boardUI);
         console.log("BoardUI 已添加到場景");
@@ -756,16 +760,18 @@ function initializeApp(): void {
         // 創建 InfoPanel 組件
         console.log("創建 InfoPanel 組件...");
         const infoPanel = new pc.Entity('InfoPanel');
-        infoPanel.addComponent('script');
-        infoPanel.script.create('infoPanel', {
-            attributes: {
-                moneyText: moneyText,
-                levelText: levelText,
-                xpText: xpText,
-                synergiesContainer: infoPanelContainer,
-                synergyTemplate: synergyTemplate
-            }
-        });
+        const infoScript = infoPanel.addComponent('script') as pc.ScriptComponent;
+        if (infoScript) {
+            infoScript.create('infoPanel', {
+                attributes: {
+                    moneyText: moneyText,
+                    levelText: levelText,
+                    xpText: xpText,
+                    synergiesContainer: infoPanelContainer,
+                    synergyTemplate: synergyTemplate
+                }
+            });
+        }
         // 添加 InfoPanel 到場景
         app.root.addChild(infoPanel);
         console.log("InfoPanel 已添加到場景");
@@ -779,15 +785,17 @@ function initializeApp(): void {
         // 創建 ActionButtonPanel 組件
         console.log("創建 ActionButtonPanel 組件...");
         const actionButtonPanel = new pc.Entity('ActionButtonPanel');
-        actionButtonPanel.addComponent('script');
-        actionButtonPanel.script.create('actionButtonPanel', {
-            attributes: {
-                buyXPButton: buyXPButton,
-                xpProgressBar: xpProgressBar,
-                xpText: xpText,
-                levelText: levelText
-            }
-        });
+        const actionScript = actionButtonPanel.addComponent('script') as pc.ScriptComponent;
+        if (actionScript) {
+            actionScript.create('actionButtonPanel', {
+                attributes: {
+                    buyXPButton: buyXPButton,
+                    xpProgressBar: xpProgressBar,
+                    xpText: xpText,
+                    levelText: levelText
+                }
+            });
+        }
         // 添加 ActionButtonPanel 到場景
         app.root.addChild(actionButtonPanel);
         console.log("ActionButtonPanel 已添加到場景");
