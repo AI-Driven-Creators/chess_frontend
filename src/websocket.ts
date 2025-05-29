@@ -51,6 +51,7 @@ export class WebSocketManager {
         };
 
         this.socket.onmessage = (event) => {
+          console.log('前端收到 WebSocket 訊息:', event.data);
           try {
             const message = JSON.parse(event.data);
             const { type, payload } = message;
@@ -111,6 +112,7 @@ export class WebSocketManager {
 
       try {
         const message = JSON.stringify({ type, payload });
+        console.log('WebSocket send:', message);
         this.socket.send(message);
         resolve();
       } catch (error) {
@@ -164,4 +166,4 @@ export class WebSocketManager {
 }
 
 // Create a singleton instance for global use
-export const webSocketManager = new WebSocketManager('ws://localhost:8080');
+export const webSocketManager = new WebSocketManager('ws://127.0.0.1:9002');

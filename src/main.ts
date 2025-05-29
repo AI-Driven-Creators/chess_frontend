@@ -120,6 +120,15 @@ function initializeApp(): void {
         });
         app.root.addChild(uiRoot);
         
+        // 手動初始化 UI 事件系統（正確傳入 canvas）
+        const canvas = app.graphicsDevice.canvas;
+        if (!app.elementInput) {
+            app.elementInput = new pc.ElementInput(canvas, {
+                useMouse: true,
+                useTouch: true
+            });
+        }
+        
         // Create UI containers with visible borders and labels
         const shopContainer = new pc.Entity('Shop Container');
         shopContainer.addComponent('element', {
@@ -816,8 +825,15 @@ function initializeApp(): void {
         app.root.addChild(actionButtonPanel);
         console.log("ActionButtonPanel 已添加到場景");
 
-        // 設置 WebSocket 連接
-        setupWebSocket();
+        // 進入大廳時就建立 WebSocket 連線
+        webSocketManager.connect()
+            .then(() => {
+                console.log('WebSocket 已連線');
+                // 可以在這裡顯示「已連線」狀態
+            })
+            .catch(error => {
+                console.error('WebSocket 連線失敗:', error);
+            });
 
         // Create lobby scene
         const lobbyScene = new LobbyUI(app);
@@ -867,26 +883,40 @@ function initializeApp(): void {
             },
             onBuyXPResult: (payload) => {
                 if (payload.success) {
-                    // 更新金錢和經驗值
-                    state.money = payload.money;
-                    state.xp = payload.xp;
-                    // 觸發經驗值更新事件
-                    app.fire('state:xp:updated', state.xp);
+                    // 用 updateState 寫入，會自動 fire 事件
+                    updateState({
+                        money: payload.money,
+                        xp: payload.xp
+                    });
                 } else {
                     console.error('購買經驗值失敗:', payload.reason);
                 }
             },
             onXPUpdatedNotice: (payload) => {
-                // 更新經驗值
-                state.xp = payload.xp;
-                // 觸發經驗值更新事件
-                app.fire('state:xp:updated', state.xp);
+                // 用 updateState 寫入所有資料
+                updateState({
+                    level: payload.level,
+                    money: payload.money,
+                    xp: payload.xp
+                });
             },
             onLevelUpNotice: (payload) => {
-                // 更新等級
-                state.level = payload.level;
-                // 觸發等級更新事件
-                app.fire('state:level:updated', state.level);
+                updateState({
+                    level: payload.level,
+                    money: payload.money,
+                    xp: payload.xp
+                });
+            }
+        });
+
+ 
+      
+        webSocketManager.on('CreateGame', (payload) => {
+            if (payload.playerId) {
+                state.playerId = payload.playerId;
+                console.log('取得 playerId (CreateGame):', state.playerId);
+                // 這裡可選擇是否切換場景
+                 app.fire('switchToGame');
             }
         });
     });
@@ -909,54 +939,19 @@ function initializeApp(): void {
  * Sets up the WebSocket connection
  */
 function setupWebSocket(): void {
-    // In a real application, you would connect to a real WebSocket server
-    // For now, we'll just simulate a connection
-    
-    console.log('Setting up WebSocket connection...');
-    
-    // Uncomment this to connect to a real WebSocket server
-    /*
     webSocketManager.connect()
         .then(() => {
             console.log('Connected to server');
-            
-            // Set the player ID for drag and drop
             setDragDropPlayerId('p1');
-            
-            // Set up event listeners
-            setupEventListeners({
-                onGetGameStateResult: (payload) => {
-                    if (payload.success) {
-                        updateState(payload.state);
-                    }
-                },
-                // Add more event handlers here
-            });
-            
-            // Create a game
             sendCreateGame('p1', 42);
         })
         .catch(error => {
             console.error('Connection failed:', error);
         });
-    */
-    
-    // For demo purposes, simulate a successful connection
-    setTimeout(() => {
-        console.log('Simulated connection successful');
-        
-        // Set the player ID for drag and drop
-        setDragDropPlayerId('p1');
-        
-        // Simulate a game state
-        simulateGameState();
-    }, 1000);
 
-    // Add CreateGameResult event listener
     webSocketManager.on('CreateGameResult', (payload) => {
         if (payload.success) {
             console.log('遊戲創建成功:', payload);
-            // Lobby scene has already handled scene switch
         }
     });
 }
@@ -972,7 +967,7 @@ function simulateGameState(): void {
         round: 1,
         money: 10,
         level: 3,
-        xp: { current: 8, required: 6 },
+        xp: { current: 4, required: 8 },
         shop: [
             { chess: 'Knight', level: 1 },
             { chess: 'Mage', level: 1 },

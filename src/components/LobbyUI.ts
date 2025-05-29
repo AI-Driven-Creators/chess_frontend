@@ -1,4 +1,5 @@
 import * as pc from 'playcanvas';
+import { webSocketManager } from '../websocket.js';
 
 /**
  * LobbyUI - 簡化版本
@@ -156,7 +157,17 @@ export class LobbyUI extends pc.Entity {
     // 添加事件監聽
     button.addEventListener('click', () => {
       console.log('開始遊戲按鈕被點擊');
-      this.app.fire('switchToGame');
+      console.log('準備發送 CreateGame 請求...');
+      webSocketManager.send('CreateGame', {
+        playerId: '', // 讓後端分配
+        seed: 42
+      }).then(() => {
+        console.log('CreateGame 請求已送出');
+      }).catch(err => {
+        console.error('CreateGame 發送失敗:', err);
+      });
+      // 建議收到 CreateGameResult 再切換場景
+      // this.app.fire('switchToGame');
     });
     
     // 添加到文檔

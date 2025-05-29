@@ -60,7 +60,7 @@ const initialState: GameState = {
   gameId: '',
   playerId: '',
   round: 1,
-  money: 10,
+  money: 100,
   level: 1,
   xp: { current: 0, required: 2 },
   shop: [],
@@ -120,7 +120,8 @@ export function updateState(newState: Partial<GameState>): void {
   
   // 使用事件發送器觸發事件
   if (newState.xp && (newState.xp.current !== oldState.xp.current || newState.xp.required !== oldState.xp.required)) {
-      eventEmitter.fire('state:xp:updated', newState.xp);
+    console.log('gameState.ts: fire state:xp:updated', newState.xp);
+    eventEmitter.fire('state:xp:updated', newState.xp);
   }
   
   if (newState.level && newState.level !== oldState.level) {

@@ -8,6 +8,7 @@
 import { state } from '../gameState.js';
 import { sendBuyXP } from '../utils/apiHelpers.js';
 import * as pc from 'playcanvas';
+import { webSocketManager } from '../websocket.js';
 
 // Define the component attributes
 interface ActionButtonPanelAttributes {
@@ -58,7 +59,16 @@ export class ActionButtonPanel extends pc.ScriptType {
         this.buyXPButton.element.enabled = true;
 
         // 設置按鈕點擊事件
-        this.buyXPButton.element.on('click', this.onBuyXPClick, this);
+        this.buyXPButton.element.on('click', () => {
+            console.log('BuyXP 按鈕被點擊！ 準備發送 BuyXP 訊息...');
+            webSocketManager.send('BuyXP', { playerId: state.playerId })
+              .then(() => {
+                console.log('BuyXP 訊息已送出！');
+              })
+              .catch(err => {
+                console.error('BuyXP 發送失敗:', err);
+              });
+        });
         console.log('ActionButtonPanel: 按鈕點擊事件已設置');
 
         console.log('ActionButtonPanel: 按鈕狀態:', {
@@ -85,65 +95,11 @@ export class ActionButtonPanel extends pc.ScriptType {
      */
     public destroy(): void {
         // Remove button click handlers
-        this.buyXPButton.element!.off('click', this.onBuyXPClick, this);
+        this.buyXPButton.element!.off('click');
 
         // Remove state change listeners
         this.app.off('state:xp:updated', this.onXPUpdated, this);
         this.app.off('state:level:updated', this.onLevelUpdated, this);
-    }
-
-    /**
-     * Handles clicking on the Buy XP button
-     */
-    private onBuyXPClick(): void {
-        console.log('ActionButtonPanel: 購買經驗值按鈕被點擊');
-        console.log('ActionButtonPanel: 當前狀態:', {
-            money: state.money,
-            xp: state.xp,
-            level: state.level
-        });
-        
-        // 檢查是否有足夠的金錢
-        const xpCost = 4;
-        if (state.money >= xpCost) {
-            console.log('ActionButtonPanel: 金錢足夠，開始更新狀態');
-            
-            // 更新狀態
-            const newMoney = state.money - xpCost;
-            const newXP = {
-                current: state.xp.current + 4,
-                required: state.xp.required
-            };
-            
-            // 更新金錢
-            state.money = newMoney;
-            console.log('ActionButtonPanel: 金錢已更新:', newMoney);
-            
-            // 觸發經驗值更新事件
-            this.app.fire('state:xp:updated', newXP);
-            console.log('ActionButtonPanel: 經驗值更新事件已觸發');
-            
-            // 檢查是否需要升級
-            if (newXP.current >= newXP.required) {
-                console.log('ActionButtonPanel: 觸發升級');
-                const newLevel = state.level + 1;
-                state.level = newLevel;
-                state.xp = {
-                    current: 0,
-                    required: newLevel * 2 + 2
-                };
-                this.app.fire('state:level:updated', newLevel);
-                this.playLevelUpAnimation();
-                console.log('ActionButtonPanel: 升級完成，新等級:', newLevel);
-            } else {
-                state.xp = newXP;
-                console.log('ActionButtonPanel: 經驗值已更新:', newXP);
-            }
-            
-            console.log('ActionButtonPanel: 更新完成，新狀態:', state);
-        } else {
-            console.log('ActionButtonPanel: 金錢不足，無法購買經驗值');
-        }
     }
 
     /**
