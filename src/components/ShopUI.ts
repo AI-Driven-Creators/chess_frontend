@@ -7,6 +7,8 @@
 
 import { state, ShopItem } from '../gameState.js';
 import { sendBuyChess, sendRefreshShop, sendLockShop } from '../utils/apiHelpers.js';
+import { webSocketManager } from '../websocket.js';
+
 import * as pc from 'playcanvas';
 
 // Define the component attributes
@@ -65,6 +67,9 @@ export class ShopUI extends pc.ScriptType {
         this.app.on('state:shop:updated', this.onShopUpdated, this);
         this.app.on('state:money:updated', this.onMoneyUpdated, this);
         this.app.on('state:shop:locked', this.onShopLockUpdated, this);
+
+        // Listen to WebSocket RefreshShopResult
+        webSocketManager.on('RefreshShopResult', this.onRefreshShopResult);
     }
 
     /**
@@ -83,6 +88,8 @@ export class ShopUI extends pc.ScriptType {
         // Destroy cards
         this.cards.forEach(card => card.destroy());
         this.cards = [];
+
+        webSocketManager.off('RefreshShopResult', this.onRefreshShopResult);
     }
 
     /**
@@ -222,9 +229,27 @@ export class ShopUI extends pc.ScriptType {
      * Handles clicking on the refresh button
      */
     private onRefreshClick(): void {
-        // Refresh the shop
-        sendRefreshShop(state.playerId)
-            .catch(error => console.error('Error refreshing shop:', error));
+        if (!this.refreshButton || !this.refreshButton.element) return;
+        this.refreshButton.element!.enabled = false;
+
+        webSocketManager.send('RefreshShop', {
+            playerId: state.playerId
+        }).catch((err) => {
+            console.error('發送 RefreshShop 失敗:', err);
+            this.refreshButton.element!.enabled = true;
+        });
+    }
+
+    private onRefreshShopResult = (payload: any) => {
+        if (payload.playerId !== state.playerId) return;
+        if (payload.success) {
+            this.updateShop(payload.shop);
+            this.updateMoney(payload.money);
+            this.app.fire('state:money:updated', payload.money);
+            this.app.fire('state:shop:updated', payload.shop);
+        } else {
+            console.error('刷新商店失敗');
+        }
     }
 
     /**
@@ -242,6 +267,10 @@ export class ShopUI extends pc.ScriptType {
      */
     private onShopUpdated(shop: ShopItem[]): void {
         this.updateShop(shop);
+        // 重新啟用刷新按鈕
+        if (this.refreshButton && this.refreshButton.element) {
+            this.refreshButton.element.enabled = true;
+        }
     }
 
     /**

@@ -430,7 +430,8 @@ function initializeApp(): void {
             pivot: new pc.Vec2(0.5, 0.5),
             width: 100,
             height: 40,
-            color: new pc.Color(0.2, 0.6, 0.2, 0.8)
+            color: new pc.Color(0.2, 0.6, 0.2, 0.8),
+            useInput: true // 啟用輸入事件
         });
         
         const refreshText = new pc.Entity('RefreshText');
@@ -449,6 +450,59 @@ function initializeApp(): void {
         });
         refreshButton.addChild(refreshText);
         shopContainer.addChild(refreshButton);
+
+        // 綁定點擊事件
+        if(refreshButton.element) {
+            refreshButton.element.on('pointerdown', () => {
+                if (webSocketManager.isConnected()) {
+                webSocketManager.send('RefreshShop', {
+                    playerId: 'p1'
+                }).then(() => {
+                    console.log('刷新商店請求已發送');
+                }).catch((err) => {
+                    console.error('發送刷新商店請求時出錯:', err);
+                });
+                } else {
+                console.warn('WebSocket 尚未連線，無法刷新商店');
+                }
+            });
+        }
+
+        webSocketManager.on('RefreshShopResult', (payload) => {
+            console.log('收到刷新商店結果:', payload);
+            updateShopUI(payload.shopItems);
+        });          
+          
+          
+        function updateShopUI(shopItems: Array<{id: string, name: string, level: number}>) {
+            // // 清除舊的商店卡牌（除了模板）
+            // shopContainer.children.forEach(child => {
+            //     if (child !== shopCardTemplate) {
+            //         child.destroy();
+            //     }
+            // });
+        
+            // shopItems.forEach((item, index) => {
+            //     // 複製模板
+            //     const card = shopCardTemplate.clone();
+            //     card.enabled = true;
+            //     card.setLocalPosition((index - (shopItems.length-1)/2) * 130, 0, 0); // 排列水平間距130
+        
+            //     // 找名字和等級元件，更新文字
+            //     const nameText = card.findByName('NameText');
+            //     if (nameText && nameText.element) {
+            //         nameText.element.text = item.name;
+            //     }
+            //     const levelText = card.findByName('LevelText');
+            //     if (levelText && levelText.element) {
+            //         levelText.element.text = '★' + item.level;
+            //     }
+        
+            //     // 加入商店容器
+            //     shopContainer.addChild(card);
+            // });
+        }        
+        
         
         const lockButton = new pc.Entity('LockButton');
         lockButton.addComponent('element', {
@@ -933,6 +987,21 @@ function initializeApp(): void {
     eventEmitter.on('state:money:updated', (money) => {
         app.fire('state:money:updated', money);
     });
+
+    // RefreshShopResult event listener
+    webSocketManager.on('RefreshShopResult', (payload) => {
+    if (payload.success) {
+        // 更新商店狀態
+        state.shop = payload.shop;
+        state.money = payload.money;
+        
+        // 觸發 UI 更新事件
+        app.fire('state:shop:updated', payload.shop);
+        app.fire('state:money:updated', payload.money);
+    } else {
+        console.error('刷新商店失敗');
+    }
+});
 }
 
 /**
